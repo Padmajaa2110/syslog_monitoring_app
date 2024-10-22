@@ -1,0 +1,17 @@
+[app/ui]
+version = 9.2.2
+modtime = 1728392490.114793000
+
+[app/launcher]
+version = 9.2.2
+modtime = 1728392490.115604000
+
+[indexes/syslog_monitoring_idx]
+owner = admin
+version = 9.2.2
+modtime = 1728392569.740321000
+
+[views/syslog_monitoring]
+owner = admin
+version = 9.2.2
+modtime = 1729170300.138465000

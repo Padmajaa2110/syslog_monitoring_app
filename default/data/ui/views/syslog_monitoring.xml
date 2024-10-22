@@ -1,0 +1,145 @@
+<form version="1.1" theme="light">
+  <label>Syslog_Monitoring</label>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="multiselect" token="host">
+      <label>syslog_host</label>
+      <valuePrefix>host="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+      <search>
+        <query>index=syslog_monitoring_idx|stats count by host</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Total Syslog events</title>
+        <search>
+          <query>index=syslog_monitoring_idx |stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>total events by host</title>
+        <search>
+          <query>index="syslog_monitoring_idx" $host$ |stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Number of selected hosts</title>
+        <search>
+          <query>index=syslog_monitoring_idx $host$ |stats dc(host)</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Latest event from selected host</title>
+        <search>
+          <query>index="syslog_monitoring_idx" $host$ | stats latest(_time) as time1 by host | eval time=strftime(time1,"%m/%d/%y %H:%M:%S")| table host time</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Total count from each host</title>
+        <search>
+          <query>index="syslog_monitoring_idx"  | stats count by host</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <viz type="heat-map-viz.heat-map-viz">
+        <title>Heat Map</title>
+        <search>
+          <query>index="syslog_monitoring_idx" | timechart count by host | fields - NULL</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="heat-map-viz.heat-map-viz.colorCritical">#DC4E41</option>
+        <option name="heat-map-viz.heat-map-viz.colorHigh">#F1813F</option>
+        <option name="heat-map-viz.heat-map-viz.colorLow">#53A051</option>
+        <option name="heat-map-viz.heat-map-viz.colorMedium">#F8BE34</option>
+        <option name="heat-map-viz.heat-map-viz.convertTimeToUTC">false</option>
+        <option name="heat-map-viz.heat-map-viz.enableAnimation">true</option>
+        <option name="heat-map-viz.heat-map-viz.enableShades">true</option>
+        <option name="heat-map-viz.heat-map-viz.hideCellBorders">false</option>
+        <option name="heat-map-viz.heat-map-viz.labelCritical">Critical</option>
+        <option name="heat-map-viz.heat-map-viz.labelFontSize">18</option>
+        <option name="heat-map-viz.heat-map-viz.labelHigh">High</option>
+        <option name="heat-map-viz.heat-map-viz.labelLow">Low</option>
+        <option name="heat-map-viz.heat-map-viz.labelMedium">Medium</option>
+        <option name="heat-map-viz.heat-map-viz.legendPosition">top</option>
+        <option name="heat-map-viz.heat-map-viz.legendText">ranges</option>
+        <option name="heat-map-viz.heat-map-viz.reverseNegativeShade">false</option>
+        <option name="heat-map-viz.heat-map-viz.shape">square</option>
+        <option name="heat-map-viz.heat-map-viz.showDateInTooltip">true</option>
+        <option name="heat-map-viz.heat-map-viz.showLegend">true</option>
+        <option name="heat-map-viz.heat-map-viz.showValues">false</option>
+        <option name="heat-map-viz.heat-map-viz.tokenLabel">hm_token_label</option>
+        <option name="heat-map-viz.heat-map-viz.tokenTime">hm_token_time</option>
+        <option name="heat-map-viz.heat-map-viz.tokenValue">hm_token_value</option>
+        <option name="heat-map-viz.heat-map-viz.tooltipDateFormat">auto</option>
+        <option name="heat-map-viz.heat-map-viz.valHigh">3000</option>
+        <option name="heat-map-viz.heat-map-viz.valLow">0</option>
+        <option name="heat-map-viz.heat-map-viz.valMedium">1000</option>
+        <option name="heat-map-viz.heat-map-viz.xAxisDateFormat">auto</option>
+        <option name="heat-map-viz.heat-map-viz.xAxisRotate">false</option>
+        <option name="heat-map-viz.heat-map-viz.xAxisTickCount">0</option>
+        <option name="heat-map-viz.heat-map-viz.yaxiswidth">auto</option>
+        <option name="heat-map-viz.heat-map-viz.yaxiswidthpx">250</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>events</title>
+        <search>
+          <query>index="syslog_monitoring_idx"  $host$ | table host source sourcetype log_detail</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>
